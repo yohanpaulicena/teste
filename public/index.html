@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard de Métricas - Social & Tráfego Pago</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="header">
+        <div>
+          <p class="eyebrow">Dashboard em Canvas</p>
+          <h1>Métricas de Social Media & Tráfego Pago</h1>
+          <p class="subtitle">
+            Organize KPIs para seus clientes e edite tudo direto no canvas.
+          </p>
+        </div>
+        <button id="resetLayout" class="ghost">Resetar layout</button>
+      </header>
+
+      <main class="content">
+        <section class="panel">
+          <h2>Adicionar métrica</h2>
+          <form id="metricForm" class="form">
+            <label>
+              Nome
+              <input type="text" name="title" placeholder="Ex: Leads" required />
+            </label>
+            <label>
+              Valor
+              <input type="number" name="value" placeholder="Ex: 1280" required />
+            </label>
+            <label>
+              Unidade
+              <input type="text" name="unit" placeholder="Ex: /mês" />
+            </label>
+            <label>
+              Contexto
+              <select name="context">
+                <option value="social">Social Media</option>
+                <option value="paid">Tráfego Pago</option>
+                <option value="mixed">Misto</option>
+              </select>
+            </label>
+            <label>
+              Observações
+              <textarea name="notes" rows="3" placeholder="Ex: Meta principal da campanha."></textarea>
+            </label>
+            <button type="submit">Adicionar ao canvas</button>
+          </form>
+        </section>
+
+        <section class="canvas-wrapper">
+          <div class="canvas-header">
+            <div>
+              <h2>Canvas do cliente</h2>
+              <p>Clique em um card para editar, arraste para reorganizar.</p>
+            </div>
+            <div class="legend">
+              <span class="tag social">Social Media</span>
+              <span class="tag paid">Tráfego Pago</span>
+              <span class="tag mixed">Misto</span>
+            </div>
+          </div>
+          <canvas id="dashboardCanvas" aria-label="Dashboard em canvas"></canvas>
+          <p class="hint">
+            Dica: arraste os cards para criar o layout ideal para cada cliente.
+          </p>
+        </section>
+
+        <section class="panel">
+          <h2>Editar métrica</h2>
+          <div id="emptyState" class="empty">
+            Selecione um card no canvas para editar.
+          </div>
+          <form id="editForm" class="form hidden">
+            <input type="hidden" name="id" />
+            <label>
+              Nome
+              <input type="text" name="title" required />
+            </label>
+            <label>
+              Valor
+              <input type="number" name="value" required />
+            </label>
+            <label>
+              Unidade
+              <input type="text" name="unit" />
+            </label>
+            <label>
+              Contexto
+              <select name="context">
+                <option value="social">Social Media</option>
+                <option value="paid">Tráfego Pago</option>
+                <option value="mixed">Misto</option>
+              </select>
+            </label>
+            <label>
+              Observações
+              <textarea name="notes" rows="3"></textarea>
+            </label>
+            <div class="form-actions">
+              <button type="submit">Salvar alterações</button>
+              <button type="button" id="deleteMetric" class="ghost">Remover card</button>
+            </div>
+          </form>
+        </section>
+      </main>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
