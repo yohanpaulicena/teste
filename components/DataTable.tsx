@@ -6,7 +6,7 @@ export default function DataTable({
   rows: (string | number)[][];
 }) {
   return (
-    <div className="rounded-3xl border border-white/10 bg-night-800/80 p-4 shadow-card overflow-x-auto">
+    <div className="card-glass rounded-3xl p-4 shadow-card overflow-x-auto">
       <table className="min-w-full text-left text-sm">
         <thead>
           <tr className="text-xs uppercase tracking-[0.2em] text-slate-400">

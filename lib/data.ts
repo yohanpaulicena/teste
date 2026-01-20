@@ -1,4 +1,5 @@
 import type { Filters } from "@/components/FiltersBar";
+import { formatNumber } from "@/lib/format";
 
 const randomSeed = (seed: number) => {
   let value = seed % 2147483647;
@@ -9,18 +10,9 @@ const randomSeed = (seed: number) => {
 };
 
 const seedFromFilters = (filters: Filters, scope: string) => {
-  const raw = `${filters.period}-${filters.client}-${filters.channel}-${filters.campaign}-${filters.objective}-${scope}`;
+  const raw = `${filters.period}-${filters.channel}-${filters.campaign}-${filters.objective}-${filters.clientId}-${scope}`;
   return raw.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
 };
-
-const format = (value: number, decimals = 0) =>
-  Intl.NumberFormat("pt-BR", {
-    maximumFractionDigits: decimals,
-  }).format(value);
-
-export const formatCurrency = (value: number) => `R$ ${format(value, 0)}`;
-export const formatNumber = (value: number) => format(value, 0);
-export const formatPercent = (value: number) => `${format(value, 1)}%`;
 
 const generateSeries = (seed: number, length: number, base: number, variance: number) => {
   const rand = randomSeed(seed);
@@ -36,7 +28,9 @@ export const getTimeSeries = (filters: Filters, scope: string) => {
   return {
     labels,
     spend: generateSeries(seed, 30, 280, 60),
+    spendPrev: generateSeries(seed + 3, 30, 260, 55),
     leads: generateSeries(seed + 11, 30, 120, 25),
+    leadsPrev: generateSeries(seed + 15, 30, 110, 22),
     impressions: generateSeries(seed + 19, 30, 5200, 900),
     clicks: generateSeries(seed + 23, 30, 380, 80),
     engagement: generateSeries(seed + 29, 30, 6.5, 1.4),

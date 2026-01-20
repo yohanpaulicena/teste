@@ -28,9 +28,9 @@ export default function Sidebar() {
   const pathname = usePathname();
   return (
     <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:shrink-0">
-      <div className="rounded-3xl bg-night-800/80 border border-white/10 p-6 shadow-card backdrop-blur">
+      <div className="card-glass rounded-3xl p-6 shadow-card">
         <div className="flex items-center gap-3">
-          <div className="h-11 w-11 rounded-2xl bg-gradient-to-br from-neon-cyan to-neon-pink flex items-center justify-center font-bold">
+          <div className="h-11 w-11 rounded-2xl bg-gradient-to-br from-neonCyan to-neonPink flex items-center justify-center font-bold text-bg0">
             A
           </div>
           <div>
@@ -49,7 +49,7 @@ export default function Sidebar() {
                 href={item.disabled ? "#" : item.href}
                 className={`flex items-center gap-3 rounded-2xl px-4 py-3 text-sm font-medium transition-colors ${
                   isActive
-                    ? "bg-gradient-to-r from-neon-cyan/20 to-neon-pink/20 text-white"
+                    ? "bg-gradient-to-r from-neonCyan/20 to-neonPink/20 text-white"
                     : "text-slate-300 hover:text-white hover:bg-white/5"
                 } ${item.disabled ? "opacity-40 cursor-not-allowed" : ""}`}
               >

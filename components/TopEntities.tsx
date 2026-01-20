@@ -6,7 +6,7 @@ export default function TopEntities({
   items: { name: string; value: string; helper: string }[];
 }) {
   return (
-    <div className="rounded-3xl border border-white/10 bg-night-800/80 p-5 shadow-card">
+    <div className="card-glass rounded-3xl p-5 shadow-card">
       <h3 className="text-base font-semibold text-white">{title}</h3>
       <div className="mt-4 space-y-3">
         {items.map((item, index) => (
@@ -17,7 +17,7 @@ export default function TopEntities({
               </p>
               <p className="text-xs text-slate-400">{item.helper}</p>
             </div>
-            <span className="text-sm text-neon-cyan font-semibold">{item.value}</span>
+            <span className="text-sm text-neonCyan font-semibold">{item.value}</span>
           </div>
         ))}
       </div>

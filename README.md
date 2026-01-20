@@ -38,12 +38,15 @@ components/
   Funnel.tsx
   KpiCard.tsx
   Sidebar.tsx
+  Tabs.tsx
   Topbar.tsx
   TopEntities.tsx
 lib/
+  auth.ts
   data.ts
- data/
-  mock.ts
+  format.ts
+styles/
+  globals.css
 ```
 
 ## Onde plugar APIs
@@ -58,8 +61,18 @@ Os dados estão centralizados em `lib/data.ts`, com funções prontas para serem
 
 Basta trocar o corpo dessas funções por integrações com seu backend/MySQL.
 
+## Single-tenant (cliente único)
+
+O usuário atual é simulado em `lib/auth.ts`:
+
+```ts
+currentUser = { role: 'client', clientId: 123 }
+```
+
+Quando `role === 'client'`, o filtro de cliente fica oculto e os dados são filtrados por `clientId` automaticamente.
+
 ## Observações de estilo
 
-- Tema dark premium com acentos neon.
-- Cards com glow, gradientes e sombras suaves.
-- Layout responsivo com sidebar fixa (desktop) e conteúdo adaptável.
+- Tema dark premium (bg0/bg1) com acentos neon (ciano/rosa/roxo).
+- Cards com glassmorphism, bordas com gradiente neon e glow sutil no hover.
+- Gráficos responsivos com tooltip premium.

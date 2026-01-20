@@ -6,18 +6,18 @@ import FiltersBar, { defaultFilters } from "@/components/FiltersBar";
 import KpiCard from "@/components/KpiCard";
 import ChartCard from "@/components/ChartCard";
 import DataTable from "@/components/DataTable";
+import Tabs from "@/components/Tabs";
 import { GradientAreaChart, BarStackChart, DonutChart } from "@/components/Charts";
-import {
-  formatNumber,
-  formatPercent,
-  getKpis,
-  getTimeSeries,
-  getTopPosts,
-} from "@/lib/data";
+import { getKpis, getTimeSeries, getTopPosts } from "@/lib/data";
+import { formatNumber, formatPercent } from "@/lib/format";
 import { audienceSplit, chartPalette, weekdays } from "@/data/mock";
+import { currentUser } from "@/lib/auth";
 
 export default function SocialPage() {
-  const [filters, setFilters] = useState(defaultFilters);
+  const [filters, setFilters] = useState({
+    ...defaultFilters,
+    clientId: currentUser.clientId,
+  });
   const kpis = useMemo(() => getKpis(filters, "social"), [filters]);
   const series = useMemo(() => getTimeSeries(filters, "social"), [filters]);
   const posts = useMemo(() => getTopPosts(filters, "social"), [filters]);
@@ -25,7 +25,9 @@ export default function SocialPage() {
   const engagementData = series.labels.map((label, index) => ({
     label,
     reach: series.reach[index],
+    reachPrev: series.reach[index] * 0.92,
     engagement: series.engagement[index],
+    engagementPrev: series.engagement[index] * 0.9,
   }));
   const activeDays = weekdays.map((label, index) => ({
     label,
@@ -34,8 +36,9 @@ export default function SocialPage() {
 
   return (
     <div className="space-y-6">
-      <Topbar />
-      <FiltersBar onChange={setFilters} />
+      <Topbar clientName={currentUser.clientName} role={currentUser.role} />
+      <Tabs />
+      <FiltersBar onChange={setFilters} showClient={currentUser.role === "admin"} />
 
       <section className="grid gap-4 xl:grid-cols-4">
         <KpiCard label="Posts publicados" value={formatNumber(128)} delta="+10%" />
@@ -50,12 +53,27 @@ export default function SocialPage() {
 
       <section className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <ChartCard title="Alcance x Interações" description="Timeline diária">
+          <ChartCard title="Alcance x Interações" description="Atual vs período anterior">
             <GradientAreaChart
               data={engagementData}
+              formatter={(value) => formatNumber(value)}
               lines={[
-                { key: "reach", color: chartPalette.cyan, fill: chartPalette.cyan },
-                { key: "engagement", color: chartPalette.pink, fill: chartPalette.pink },
+                { key: "reach", color: chartPalette.cyan, fill: chartPalette.cyan, name: "Alcance" },
+                {
+                  key: "reachPrev",
+                  color: "rgba(79, 209, 255, 0.4)",
+                  fill: chartPalette.cyan,
+                  dashed: true,
+                  name: "Alcance (anterior)",
+                },
+                { key: "engagement", color: chartPalette.pink, fill: chartPalette.pink, name: "Interações" },
+                {
+                  key: "engagementPrev",
+                  color: "rgba(255, 79, 216, 0.4)",
+                  fill: chartPalette.pink,
+                  dashed: true,
+                  name: "Interações (anterior)",
+                },
               ]}
             />
           </ChartCard>

@@ -7,21 +7,25 @@ import KpiCard from "@/components/KpiCard";
 import ChartCard from "@/components/ChartCard";
 import DataTable from "@/components/DataTable";
 import TopEntities from "@/components/TopEntities";
+import Tabs from "@/components/Tabs";
 import { GradientAreaChart, LineTrendChart } from "@/components/Charts";
 import {
-  formatCurrency,
-  formatNumber,
-  formatPercent,
   getCampaignTable,
   getKpis,
   getTimeSeries,
   getTopEntities,
   getTopPosts,
 } from "@/lib/data";
+import { formatCurrency, formatNumber, formatPercent } from "@/lib/format";
 import { chartPalette } from "@/data/mock";
+import { currentUser } from "@/lib/auth";
 
 export default function GeralPage() {
-  const [filters, setFilters] = useState(defaultFilters);
+  const [filters, setFilters] = useState({
+    ...defaultFilters,
+    clientId: currentUser.clientId,
+  });
+
   const kpis = useMemo(() => getKpis(filters, "geral"), [filters]);
   const series = useMemo(() => getTimeSeries(filters, "geral"), [filters]);
   const campaigns = useMemo(() => getCampaignTable(filters, "geral"), [filters]);
@@ -31,7 +35,9 @@ export default function GeralPage() {
   const spendLeadData = series.labels.map((label, index) => ({
     label,
     spend: series.spend[index],
+    spendPrev: series.spendPrev[index],
     leads: series.leads[index],
+    leadsPrev: series.leadsPrev[index],
   }));
   const followerData = series.labels.map((label, index) => ({
     label,
@@ -40,13 +46,14 @@ export default function GeralPage() {
 
   return (
     <div className="space-y-6">
-      <Topbar />
-      <FiltersBar onChange={setFilters} />
+      <Topbar clientName={currentUser.clientName} role={currentUser.role} />
+      <Tabs />
+      <FiltersBar onChange={setFilters} showClient={currentUser.role === "admin"} />
 
       <section className="grid gap-4 xl:grid-cols-4">
         <KpiCard label="Investimento total" value={formatCurrency(kpis.spend)} delta="+12%" />
         <KpiCard label="Leads / Conversões" value={formatNumber(kpis.leads)} delta="+8%" />
-        <KpiCard label="CPL médio" value={formatCurrency(kpis.cpl)} delta="-5%" />
+        <KpiCard label="CPL médio" value={formatCurrency(kpis.cpl)} delta="-5%" trend="down" />
         <KpiCard label="Cliques" value={formatNumber(kpis.clicks)} delta="+6%" />
         <KpiCard label="Impressões" value={formatNumber(kpis.impressions)} delta="+4%" />
         <KpiCard label="Alcance" value={formatNumber(kpis.reach)} delta="+7%" />
@@ -56,12 +63,29 @@ export default function GeralPage() {
 
       <section className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <ChartCard title="Spend vs Leads" description="Linha dupla com comparativo de período">
+          <ChartCard title="Investimento vs Leads" description="Atual vs período anterior">
             <GradientAreaChart
               data={spendLeadData}
+              formatter={(value, key) =>
+                key.includes("spend") ? formatCurrency(value) : formatNumber(value)
+              }
               lines={[
-                { key: "spend", color: chartPalette.cyan, fill: chartPalette.cyan },
-                { key: "leads", color: chartPalette.pink, fill: chartPalette.pink },
+                { key: "spend", color: chartPalette.cyan, fill: chartPalette.cyan, name: "Investimento" },
+                {
+                  key: "spendPrev",
+                  color: "rgba(79, 209, 255, 0.4)",
+                  fill: chartPalette.cyan,
+                  dashed: true,
+                  name: "Investimento (anterior)",
+                },
+                { key: "leads", color: chartPalette.pink, fill: chartPalette.pink, name: "Leads" },
+                {
+                  key: "leadsPrev",
+                  color: "rgba(255, 79, 216, 0.4)",
+                  fill: chartPalette.pink,
+                  dashed: true,
+                  name: "Leads (anterior)",
+                },
               ]}
             />
           </ChartCard>
@@ -69,6 +93,7 @@ export default function GeralPage() {
         <ChartCard title="Seguidores ganhos" description="Evolução diária">
           <LineTrendChart
             data={followerData}
+            formatter={(value) => formatNumber(value)}
             lines={[{ key: "followers", color: chartPalette.purple }]}
           />
         </ChartCard>

@@ -6,18 +6,18 @@ import FiltersBar, { defaultFilters } from "@/components/FiltersBar";
 import KpiCard from "@/components/KpiCard";
 import ChartCard from "@/components/ChartCard";
 import DataTable from "@/components/DataTable";
+import Tabs from "@/components/Tabs";
 import { GradientAreaChart, BarStackChart, DonutChart } from "@/components/Charts";
-import {
-  formatNumber,
-  formatPercent,
-  getKpis,
-  getTimeSeries,
-  getTopPosts,
-} from "@/lib/data";
+import { getKpis, getTimeSeries, getTopPosts } from "@/lib/data";
+import { formatNumber, formatPercent } from "@/lib/format";
 import { audienceSplit, chartPalette } from "@/data/mock";
+import { currentUser } from "@/lib/auth";
 
 export default function InstagramPage() {
-  const [filters, setFilters] = useState(defaultFilters);
+  const [filters, setFilters] = useState({
+    ...defaultFilters,
+    clientId: currentUser.clientId,
+  });
   const kpis = useMemo(() => getKpis(filters, "instagram"), [filters]);
   const series = useMemo(() => getTimeSeries(filters, "instagram"), [filters]);
   const posts = useMemo(() => getTopPosts(filters, "instagram"), [filters]);
@@ -25,13 +25,15 @@ export default function InstagramPage() {
   const growthData = series.labels.map((label, index) => ({
     label,
     followers: series.followers[index],
+    followersPrev: series.followers[index] * 0.92,
     engagement: series.engagement[index],
   }));
 
   return (
     <div className="space-y-6">
-      <Topbar />
-      <FiltersBar onChange={setFilters} />
+      <Topbar clientName={currentUser.clientName} role={currentUser.role} />
+      <Tabs />
+      <FiltersBar onChange={setFilters} showClient={currentUser.role === "admin"} />
 
       <section className="grid gap-4 xl:grid-cols-4">
         <KpiCard label="Seguidores" value={formatNumber(kpis.followers)} delta="+3%" />
@@ -49,9 +51,17 @@ export default function InstagramPage() {
           <ChartCard title="Crescimento & Engajamento" description="Timeline diária">
             <GradientAreaChart
               data={growthData}
+              formatter={(value) => formatNumber(value)}
               lines={[
-                { key: "followers", color: chartPalette.cyan, fill: chartPalette.cyan },
-                { key: "engagement", color: chartPalette.pink, fill: chartPalette.pink },
+                { key: "followers", color: chartPalette.cyan, fill: chartPalette.cyan, name: "Seguidores" },
+                {
+                  key: "followersPrev",
+                  color: "rgba(79, 209, 255, 0.4)",
+                  fill: chartPalette.cyan,
+                  dashed: true,
+                  name: "Seguidores (anterior)",
+                },
+                { key: "engagement", color: chartPalette.pink, fill: chartPalette.pink, name: "Engajamento" },
               ]}
             />
           </ChartCard>
