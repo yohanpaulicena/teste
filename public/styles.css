@@ -1,0 +1,276 @@
+:root {
+  color-scheme: light;
+  font-family: "Inter", "Plus Jakarta Sans", system-ui, sans-serif;
+  background: #0b1020;
+  color: #0f172a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(circle at top, #e8f2ff 0%, #edf1f9 45%, #dfe7f6 100%);
+  color: #0f172a;
+}
+
+.app {
+  min-height: 100vh;
+  padding: 32px 48px 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  padding: 28px 32px;
+  border-radius: 24px;
+  background: linear-gradient(120deg, #12397a 0%, #1a4fa3 55%, #6b4ce6 100%);
+  color: #f8fafc;
+  box-shadow: 0 28px 60px rgba(15, 23, 42, 0.2);
+}
+
+.hero-content {
+  max-width: 620px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.logo {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: rgba(248, 250, 252, 0.2);
+  font-weight: 700;
+  font-size: 22px;
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 12px;
+  margin: 0 0 6px;
+  color: rgba(248, 250, 252, 0.7);
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: 30px;
+}
+
+.subtitle {
+  margin: 12px 0 0;
+  color: rgba(248, 250, 252, 0.78);
+  line-height: 1.5;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.primary,
+.ghost {
+  padding: 12px 18px;
+  border-radius: 14px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.primary {
+  background: #f8fafc;
+  color: #1d2b6a;
+}
+
+.ghost {
+  background: rgba(248, 250, 252, 0.18);
+  color: #f8fafc;
+  border: 1px solid rgba(248, 250, 252, 0.3);
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.filter-card {
+  background: #f8fafc;
+  padding: 14px 16px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+}
+
+.filter-card label {
+  font-size: 12px;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.filter-card select {
+  border: none;
+  font-size: 14px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: #eef2ff;
+  color: #1e293b;
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.tab {
+  border: none;
+  background: #f8fafc;
+  padding: 10px 16px;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+}
+
+.tab.active {
+  background: #1d4ed8;
+  color: #f8fafc;
+}
+
+.tab-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.tab-panel {
+  display: none;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.tab-panel.active {
+  display: flex;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+.kpi-card {
+  padding: 16px;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.kpi-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, rgba(59, 130, 246, 0.12), rgba(14, 165, 233, 0.05));
+  pointer-events: none;
+}
+
+.kpi-card h4 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  color: #475569;
+}
+
+.kpi-value {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.kpi-compare {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: #64748b;
+}
+
+.kpi-compare strong {
+  color: #16a34a;
+}
+
+.kpi-compare.down strong {
+  color: #dc2626;
+}
+
+.chart-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 18px;
+}
+
+.chart-card {
+  background: #ffffff;
+  padding: 16px;
+  border-radius: 20px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.chart-card header h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.chart-card header p {
+  margin: 4px 0 0;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.chart-card.wide {
+  grid-column: span 2;
+}
+
+canvas {
+  width: 100%;
+  height: 280px;
+}
+
+@media (max-width: 1100px) {
+  .app {
+    padding: 24px;
+  }
+
+  .hero {
+    flex-direction: column;
+  }
+
+  .chart-card.wide {
+    grid-column: span 1;
+  }
+}
+
+@media (max-width: 720px) {
+  .hero-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+}
