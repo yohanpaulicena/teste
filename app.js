@@ -1,491 +1,307 @@
-const chartInstances = new Map();
+const canvas = document.getElementById("dashboardCanvas");
+const ctx = canvas.getContext("2d");
 
-const tabs = document.querySelectorAll(".tab");
-const panels = document.querySelectorAll(".tab-panel");
+const metricForm = document.getElementById("metricForm");
+const editForm = document.getElementById("editForm");
+const emptyState = document.getElementById("emptyState");
+const deleteMetricButton = document.getElementById("deleteMetric");
+const resetLayoutButton = document.getElementById("resetLayout");
 
 const palette = {
-  blue: "#2563eb",
-  sky: "#38bdf8",
-  purple: "#7c3aed",
-  green: "#22c55e",
-  orange: "#f97316",
-  pink: "#ec4899",
-  gray: "#94a3b8",
+  social: { fill: "#e4f2ff", accent: "#1e5aa8" },
+  paid: { fill: "#ffece1", accent: "#a24a00" },
+  mixed: { fill: "#efe7ff", accent: "#5a2db3" },
 };
 
-const kpiConfig = {
-  traffic: [
-    { label: "Investimento", key: "spend", prefix: "R$" },
-    { label: "Leads", key: "leads" },
-    { label: "CPL", key: "cpl", prefix: "R$" },
-    { label: "CPC", key: "cpc", prefix: "R$" },
-    { label: "CTR", key: "ctr", suffix: "%" },
-  ],
-  social: [
-    { label: "Alcance", key: "reach" },
-    { label: "Engajamento", key: "engagement", suffix: "%" },
-    { label: "Seguidores", key: "followers" },
-    { label: "Views", key: "views" },
-    { label: "CTR", key: "ctr", suffix: "%" },
-  ],
-  meta: [
-    { label: "Investimento", key: "spend", prefix: "R$" },
-    { label: "Conversões", key: "conversions" },
-    { label: "CPA", key: "cpa", prefix: "R$" },
-    { label: "ROAS", key: "roas", suffix: "x" },
-    { label: "CTR", key: "ctr", suffix: "%" },
-  ],
-  instagram: [
-    { label: "Seguidores", key: "followers" },
-    { label: "Engajamento", key: "engagement", suffix: "%" },
-    { label: "Stories", key: "stories" },
-    { label: "Reels", key: "reels" },
-    { label: "Salvos", key: "saves" },
-  ],
-  google: [
-    { label: "Investimento", key: "spend", prefix: "R$" },
-    { label: "Cliques", key: "clicks" },
-    { label: "CPA", key: "cpa", prefix: "R$" },
-    { label: "Conversões", key: "conversions" },
-    { label: "CTR", key: "ctr", suffix: "%" },
-  ],
+let metrics = [];
+let selectedId = null;
+let dragTarget = null;
+let dragOffset = { x: 0, y: 0 };
+
+const layoutDefaults = {
+  width: 220,
+  height: 140,
+  gap: 20,
+  startX: 24,
+  startY: 24,
 };
 
-function rand(min, max) {
-  return Math.random() * (max - min) + min;
+const defaultMetrics = [
+  {
+    title: "Alcance orgânico",
+    value: 240000,
+    unit: "impressões",
+    context: "social",
+    notes: "Meta do mês +12%.",
+  },
+  {
+    title: "Engajamento",
+    value: 4.3,
+    unit: "%",
+    context: "social",
+    notes: "Stories e reels puxando a média.",
+  },
+  {
+    title: "Investimento",
+    value: 18500,
+    unit: "R$",
+    context: "paid",
+    notes: "Distribuir 65% para conversão.",
+  },
+  {
+    title: "CPA médio",
+    value: 42,
+    unit: "R$",
+    context: "paid",
+    notes: "Monitorar criativos em teste A/B.",
+  },
+];
+
+function resizeCanvas() {
+  const { width, height } = canvas.getBoundingClientRect();
+  const ratio = window.devicePixelRatio || 1;
+  canvas.width = width * ratio;
+  canvas.height = height * ratio;
+  ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+  draw();
 }
 
-function generateSeries(days, base, variance) {
-  return Array.from({ length: days }, (_, index) => {
-    const factor = Math.sin(index / 6) * variance;
-    return Math.max(0, base + factor + rand(-variance, variance));
-  });
-}
-
-function formatNumber(value) {
-  return Intl.NumberFormat("pt-BR", { maximumFractionDigits: 1 }).format(value);
-}
-
-function formatCurrency(value) {
-  return `R$ ${formatNumber(value)}`;
-}
-
-function formatPercent(value) {
-  return `${formatNumber(value)}%`;
-}
-
-function buildKpiCards(target, kpis, current, previous) {
-  target.innerHTML = "";
-  kpis.forEach((kpi) => {
-    const value = current[kpi.key] ?? 0;
-    const prev = previous[kpi.key] ?? 0;
-    const delta = prev === 0 ? 0 : ((value - prev) / prev) * 100;
-    const card = document.createElement("div");
-    card.className = "kpi-card";
-
-    const label = document.createElement("h4");
-    label.textContent = kpi.label;
-
-    const metric = document.createElement("p");
-    metric.className = "kpi-value";
-
-    const formatted = kpi.prefix
-      ? `${kpi.prefix} ${formatNumber(value)}`
-      : kpi.suffix
-        ? `${formatNumber(value)}${kpi.suffix}`
-        : formatNumber(value);
-
-    metric.textContent = formatted;
-
-    const compare = document.createElement("p");
-    compare.className = "kpi-compare";
-    const direction = delta >= 0 ? "up" : "down";
-    if (direction === "down") {
-      compare.classList.add("down");
-    }
-    compare.innerHTML = `<strong>${formatNumber(delta)}%</strong> vs período anterior`;
-
-    card.append(label, metric, compare);
-    target.append(card);
-  });
-}
-
-function buildChart(canvasId, config) {
-  const ctx = document.getElementById(canvasId);
-  if (!ctx) return;
-  if (chartInstances.has(canvasId)) {
-    chartInstances.get(canvasId).destroy();
-  }
-  const chart = new Chart(ctx, config);
-  chartInstances.set(canvasId, chart);
-}
-
-function mountCharts(data) {
-  buildChart("trafficSpendChart", {
-    type: "line",
-    data: {
-      labels: data.labels,
-      datasets: [
-        {
-          label: "Investimento",
-          data: data.traffic.spendSeries,
-          borderColor: palette.blue,
-          backgroundColor: "rgba(37, 99, 235, 0.15)",
-          fill: true,
-          tension: 0.4,
-        },
-        {
-          label: "Leads",
-          data: data.traffic.leadsSeries,
-          borderColor: palette.green,
-          backgroundColor: "rgba(34, 197, 94, 0.12)",
-          fill: true,
-          tension: 0.4,
-        },
-      ],
-    },
-    options: { responsive: true, plugins: { legend: { position: "top" } } },
-  });
-
-  buildChart("trafficFunnelChart", {
-    type: "bar",
-    data: {
-      labels: ["Impressões", "Cliques", "Leads"],
-      datasets: [
-        {
-          data: [data.traffic.impressions, data.traffic.clicks, data.traffic.leads],
-          backgroundColor: [palette.blue, palette.sky, palette.green],
-        },
-      ],
-    },
-    options: { plugins: { legend: { display: false } } },
-  });
-
-  buildChart("trafficEfficiencyChart", {
-    type: "line",
-    data: {
-      labels: data.labels,
-      datasets: [
-        {
-          label: "CPA",
-          data: data.traffic.cpaSeries,
-          borderColor: palette.orange,
-          tension: 0.35,
-        },
-        {
-          label: "CPC",
-          data: data.traffic.cpcSeries,
-          borderColor: palette.purple,
-          tension: 0.35,
-        },
-      ],
-    },
-  });
-
-  buildChart("socialEngagementChart", {
-    type: "line",
-    data: {
-      labels: data.labels,
-      datasets: [
-        {
-          label: "Alcance",
-          data: data.social.reachSeries,
-          borderColor: palette.blue,
-          backgroundColor: "rgba(37, 99, 235, 0.1)",
-          fill: true,
-          tension: 0.4,
-        },
-        {
-          label: "Engajamento",
-          data: data.social.engagementSeries,
-          borderColor: palette.pink,
-          backgroundColor: "rgba(236, 72, 153, 0.12)",
-          fill: true,
-          tension: 0.4,
-        },
-      ],
-    },
-  });
-
-  buildChart("socialFormatChart", {
-    type: "doughnut",
-    data: {
-      labels: ["Reels", "Stories", "Feed"],
-      datasets: [
-        {
-          data: [42, 35, 23],
-          backgroundColor: [palette.pink, palette.blue, palette.purple],
-        },
-      ],
-    },
-  });
-
-  buildChart("socialAudienceChart", {
-    type: "doughnut",
-    data: {
-      labels: ["Feminino", "Masculino", "Outro"],
-      datasets: [
-        {
-          data: [48, 44, 8],
-          backgroundColor: [palette.purple, palette.blue, palette.gray],
-        },
-      ],
-    },
-  });
-
-  buildChart("metaPerformanceChart", {
-    type: "line",
-    data: {
-      labels: data.labels,
-      datasets: [
-        {
-          label: "Investimento",
-          data: data.meta.spendSeries,
-          borderColor: palette.blue,
-          tension: 0.4,
-        },
-        {
-          label: "Conversões",
-          data: data.meta.conversionSeries,
-          borderColor: palette.green,
-          tension: 0.4,
-        },
-      ],
-    },
-  });
-
-  buildChart("metaCampaignChart", {
-    type: "bar",
-    data: {
-      labels: ["Campanha A", "Campanha B", "Campanha C"],
-      datasets: [
-        {
-          data: [320, 260, 210],
-          backgroundColor: [palette.blue, palette.purple, palette.sky],
-        },
-      ],
-    },
-    options: { plugins: { legend: { display: false } } },
-  });
-
-  buildChart("metaSegmentChart", {
-    type: "doughnut",
-    data: {
-      labels: ["Retargeting", "Aquisição", "Remarketing"],
-      datasets: [
-        {
-          data: [45, 35, 20],
-          backgroundColor: [palette.orange, palette.pink, palette.blue],
-        },
-      ],
-    },
-  });
-
-  buildChart("instagramGrowthChart", {
-    type: "line",
-    data: {
-      labels: data.labels,
-      datasets: [
-        {
-          label: "Seguidores",
-          data: data.instagram.followerSeries,
-          borderColor: palette.blue,
-          tension: 0.4,
-        },
-        {
-          label: "Engajamento",
-          data: data.instagram.engagementSeries,
-          borderColor: palette.pink,
-          tension: 0.4,
-        },
-      ],
-    },
-  });
-
-  buildChart("instagramContentChart", {
-    type: "bar",
-    data: {
-      labels: ["Stories", "Reels", "Feed"],
-      datasets: [
-        {
-          data: [72, 88, 64],
-          backgroundColor: [palette.blue, palette.pink, palette.purple],
-        },
-      ],
-    },
-    options: { plugins: { legend: { display: false } } },
-  });
-
-  buildChart("instagramPeakChart", {
-    type: "bar",
-    data: {
-      labels: ["09h", "12h", "15h", "18h", "21h"],
-      datasets: [
-        {
-          data: [32, 45, 53, 68, 57],
-          backgroundColor: palette.sky,
-        },
-      ],
-    },
-    options: { plugins: { legend: { display: false } } },
-  });
-
-  buildChart("googleClicksChart", {
-    type: "line",
-    data: {
-      labels: data.labels,
-      datasets: [
-        {
-          label: "Cliques",
-          data: data.google.clickSeries,
-          borderColor: palette.blue,
-          tension: 0.4,
-        },
-        {
-          label: "Conversões",
-          data: data.google.conversionSeries,
-          borderColor: palette.green,
-          tension: 0.4,
-        },
-      ],
-    },
-  });
-
-  buildChart("googleImpressionsChart", {
-    type: "bar",
-    data: {
-      labels: data.labels,
-      datasets: [
-        {
-          label: "Impressões",
-          data: data.google.impressionSeries,
-          backgroundColor: "rgba(37, 99, 235, 0.5)",
-        },
-      ],
-    },
-  });
-
-  buildChart("googleDeviceChart", {
-    type: "doughnut",
-    data: {
-      labels: ["Desktop", "Mobile", "Tablet"],
-      datasets: [
-        {
-          data: [52, 40, 8],
-          backgroundColor: [palette.blue, palette.pink, palette.gray],
-        },
-      ],
-    },
-  });
-}
-
-function generateData() {
-  const labels = Array.from({ length: 30 }, (_, index) => `Dia ${index + 1}`);
-
-  const traffic = {
-    spendSeries: generateSeries(30, 280, 70),
-    leadsSeries: generateSeries(30, 120, 30),
-    cpaSeries: generateSeries(30, 28, 6),
-    cpcSeries: generateSeries(30, 3.8, 0.6),
+function createMetric(data) {
+  const id = crypto.randomUUID();
+  const position = nextAvailablePosition();
+  const metric = {
+    id,
+    title: data.title,
+    value: Number(data.value),
+    unit: data.unit || "",
+    context: data.context,
+    notes: data.notes || "",
+    x: position.x,
+    y: position.y,
+    width: layoutDefaults.width,
+    height: layoutDefaults.height,
   };
+  metrics.push(metric);
+  return metric;
+}
 
-  traffic.spend = traffic.spendSeries.reduce((a, b) => a + b, 0);
-  traffic.leads = traffic.leadsSeries.reduce((a, b) => a + b, 0);
-  traffic.clicks = Math.round(traffic.leads * 6.2);
-  traffic.impressions = Math.round(traffic.clicks * 14);
-  traffic.cpl = traffic.spend / traffic.leads;
-  traffic.cpc = traffic.spend / traffic.clicks;
-  traffic.ctr = (traffic.clicks / traffic.impressions) * 100;
-  traffic.cpa = traffic.cpl;
-
-  const social = {
-    reachSeries: generateSeries(30, 4200, 900),
-    engagementSeries: generateSeries(30, 6.8, 1.1),
-  };
-  social.reach = social.reachSeries.reduce((a, b) => a + b, 0);
-  social.engagement = social.engagementSeries.reduce((a, b) => a + b, 0) / 30;
-  social.followers = Math.round(rand(4800, 5200));
-  social.views = Math.round(rand(82000, 94000));
-  social.ctr = rand(1.8, 2.6);
-
-  const meta = {
-    spendSeries: generateSeries(30, 190, 40),
-    conversionSeries: generateSeries(30, 32, 8),
-  };
-  meta.spend = meta.spendSeries.reduce((a, b) => a + b, 0);
-  meta.conversions = Math.round(meta.conversionSeries.reduce((a, b) => a + b, 0));
-  meta.cpa = meta.spend / meta.conversions;
-  meta.roas = rand(2.8, 3.6);
-  meta.ctr = rand(2.1, 3.5);
-
-  const instagram = {
-    followerSeries: generateSeries(30, 4800, 160),
-    engagementSeries: generateSeries(30, 5.2, 1.0),
-  };
-  instagram.followers = Math.round(instagram.followerSeries.at(-1));
-  instagram.engagement = instagram.engagementSeries.reduce((a, b) => a + b, 0) / 30;
-  instagram.stories = Math.round(rand(42, 56));
-  instagram.reels = Math.round(rand(28, 40));
-  instagram.saves = Math.round(rand(1300, 1800));
-
-  const google = {
-    clickSeries: generateSeries(30, 320, 80),
-    conversionSeries: generateSeries(30, 60, 14),
-    impressionSeries: generateSeries(30, 5200, 1200),
-  };
-  google.clicks = Math.round(google.clickSeries.reduce((a, b) => a + b, 0));
-  google.conversions = Math.round(google.conversionSeries.reduce((a, b) => a + b, 0));
-  google.impressions = Math.round(google.impressionSeries.reduce((a, b) => a + b, 0));
-  google.spend = google.clicks * rand(3.4, 4.1);
-  google.cpa = google.spend / google.conversions;
-  google.ctr = (google.clicks / google.impressions) * 100;
-
+function nextAvailablePosition() {
+  const columns = Math.max(
+    1,
+    Math.floor(
+      (canvas.getBoundingClientRect().width - layoutDefaults.startX) /
+        (layoutDefaults.width + layoutDefaults.gap)
+    )
+  );
+  const index = metrics.length;
+  const col = index % columns;
+  const row = Math.floor(index / columns);
   return {
-    labels,
-    traffic,
-    social,
-    meta,
-    instagram,
-    google,
+    x: layoutDefaults.startX + col * (layoutDefaults.width + layoutDefaults.gap),
+    y: layoutDefaults.startY + row * (layoutDefaults.height + layoutDefaults.gap),
   };
 }
 
-function generatePrevious(current) {
-  const variation = 0.9 + Math.random() * 0.2;
-  return Object.fromEntries(
-    Object.entries(current).map(([key, value]) => {
-      if (typeof value === "number") {
-        return [key, value * variation];
-      }
-      return [key, value];
-    })
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "#f2f4fb";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  metrics.forEach((metric) => {
+    const { fill, accent } = palette[metric.context] || palette.mixed;
+    const isSelected = metric.id === selectedId;
+
+    ctx.save();
+    ctx.fillStyle = fill;
+    ctx.strokeStyle = isSelected ? "#1f2532" : "rgba(31, 37, 50, 0.12)";
+    ctx.lineWidth = isSelected ? 2 : 1;
+    roundRect(ctx, metric.x, metric.y, metric.width, metric.height, 16);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = accent;
+    ctx.font = "600 13px Inter, sans-serif";
+    ctx.fillText(metric.context === "paid" ? "Tráfego Pago" : metric.context === "social" ? "Social Media" : "Misto", metric.x + 16, metric.y + 26);
+
+    ctx.fillStyle = "#1f2532";
+    ctx.font = "600 20px Inter, sans-serif";
+    ctx.fillText(metric.title, metric.x + 16, metric.y + 56);
+
+    ctx.fillStyle = "#1f2532";
+    ctx.font = "700 28px Inter, sans-serif";
+    ctx.fillText(formatValue(metric.value), metric.x + 16, metric.y + 92);
+
+    ctx.fillStyle = "#5b6375";
+    ctx.font = "500 13px Inter, sans-serif";
+    ctx.fillText(metric.unit, metric.x + 16, metric.y + 112);
+
+    ctx.fillStyle = "#5b6375";
+    ctx.font = "500 12px Inter, sans-serif";
+    wrapText(ctx, metric.notes, metric.x + 16, metric.y + 128, metric.width - 32, 14);
+
+    ctx.restore();
+  });
+}
+
+function roundRect(context, x, y, width, height, radius) {
+  const r = Math.min(radius, width / 2, height / 2);
+  context.beginPath();
+  context.moveTo(x + r, y);
+  context.arcTo(x + width, y, x + width, y + height, r);
+  context.arcTo(x + width, y + height, x, y + height, r);
+  context.arcTo(x, y + height, x, y, r);
+  context.arcTo(x, y, x + width, y, r);
+  context.closePath();
+}
+
+function wrapText(context, text, x, y, maxWidth, lineHeight) {
+  if (!text) {
+    return;
+  }
+  const words = text.split(" ");
+  let line = "";
+  let offsetY = 0;
+  words.forEach((word, index) => {
+    const testLine = line + word + " ";
+    const { width } = context.measureText(testLine);
+    if (width > maxWidth && index > 0) {
+      context.fillText(line, x, y + offsetY);
+      line = word + " ";
+      offsetY += lineHeight;
+    } else {
+      line = testLine;
+    }
+  });
+  context.fillText(line, x, y + offsetY);
+}
+
+function formatValue(value) {
+  if (Number.isNaN(value)) {
+    return "-";
+  }
+  return Intl.NumberFormat("pt-BR").format(value);
+}
+
+function getMetricAtPosition(x, y) {
+  return metrics.find((metric) =>
+    x >= metric.x &&
+    x <= metric.x + metric.width &&
+    y >= metric.y &&
+    y <= metric.y + metric.height
   );
 }
 
-function mountKpis(data) {
-  document.querySelectorAll("[data-kpi]").forEach((container) => {
-    const section = container.dataset.kpi;
-    const current = data[section];
-    const previous = generatePrevious(current);
-    buildKpiCards(container, kpiConfig[section], current, previous);
-  });
+function updateEditForm(metric) {
+  if (!metric) {
+    editForm.classList.add("hidden");
+    emptyState.classList.remove("hidden");
+    return;
+  }
+
+  editForm.classList.remove("hidden");
+  emptyState.classList.add("hidden");
+  editForm.elements.id.value = metric.id;
+  editForm.elements.title.value = metric.title;
+  editForm.elements.value.value = metric.value;
+  editForm.elements.unit.value = metric.unit;
+  editForm.elements.context.value = metric.context;
+  editForm.elements.notes.value = metric.notes;
 }
 
-function handleTabs() {
-  tabs.forEach((tab) => {
-    tab.addEventListener("click", () => {
-      tabs.forEach((item) => item.classList.remove("active"));
-      panels.forEach((panel) => panel.classList.remove("active"));
-      tab.classList.add("active");
-      const target = document.getElementById(`tab-${tab.dataset.tab}`);
-      if (target) {
-        target.classList.add("active");
-      }
-    });
-  });
+function selectMetric(metric) {
+  selectedId = metric ? metric.id : null;
+  updateEditForm(metric);
+  draw();
 }
 
-const dataset = generateData();
-mountKpis(dataset);
-mountCharts(dataset);
-handleTabs();
+function handleMouseDown(event) {
+  const rect = canvas.getBoundingClientRect();
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top;
+  const metric = getMetricAtPosition(x, y);
+  if (metric) {
+    selectMetric(metric);
+    dragTarget = metric;
+    dragOffset = { x: x - metric.x, y: y - metric.y };
+  } else {
+    selectMetric(null);
+  }
+}
+
+function handleMouseMove(event) {
+  if (!dragTarget) {
+    return;
+  }
+  const rect = canvas.getBoundingClientRect();
+  const x = event.clientX - rect.left;
+  const y = event.clientY - rect.top;
+  dragTarget.x = Math.max(8, Math.min(x - dragOffset.x, rect.width - dragTarget.width - 8));
+  dragTarget.y = Math.max(8, Math.min(y - dragOffset.y, rect.height - dragTarget.height - 8));
+  draw();
+}
+
+function handleMouseUp() {
+  dragTarget = null;
+}
+
+metricForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const data = Object.fromEntries(new FormData(metricForm));
+  const metric = createMetric(data);
+  metricForm.reset();
+  selectMetric(metric);
+  draw();
+});
+
+editForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const data = Object.fromEntries(new FormData(editForm));
+  const metric = metrics.find((item) => item.id === data.id);
+  if (!metric) {
+    return;
+  }
+  metric.title = data.title;
+  metric.value = Number(data.value);
+  metric.unit = data.unit;
+  metric.context = data.context;
+  metric.notes = data.notes;
+  draw();
+});
+
+deleteMetricButton.addEventListener("click", () => {
+  if (!selectedId) {
+    return;
+  }
+  metrics = metrics.filter((metric) => metric.id !== selectedId);
+  selectedId = null;
+  updateEditForm(null);
+  draw();
+});
+
+resetLayoutButton.addEventListener("click", () => {
+  metrics.forEach((metric, index) => {
+    const columns = Math.max(
+      1,
+      Math.floor(
+        (canvas.getBoundingClientRect().width - layoutDefaults.startX) /
+          (layoutDefaults.width + layoutDefaults.gap)
+      )
+    );
+    const col = index % columns;
+    const row = Math.floor(index / columns);
+    metric.x = layoutDefaults.startX + col * (layoutDefaults.width + layoutDefaults.gap);
+    metric.y = layoutDefaults.startY + row * (layoutDefaults.height + layoutDefaults.gap);
+  });
+  draw();
+});
+
+canvas.addEventListener("mousedown", handleMouseDown);
+canvas.addEventListener("mousemove", handleMouseMove);
+canvas.addEventListener("mouseup", handleMouseUp);
+canvas.addEventListener("mouseleave", handleMouseUp);
+
+window.addEventListener("resize", resizeCanvas);
+
+metrics = defaultMetrics.map((metric) => createMetric(metric));
+resizeCanvas();
+selectMetric(metrics[0]);
