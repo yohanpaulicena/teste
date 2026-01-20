@@ -18,6 +18,8 @@ npm run dev
 
 Abra `http://localhost:3000/dashboard/geral`.
 
+> Não existe `index.html` neste projeto. O conteúdo é renderizado pelo App Router do Next.
+
 ## Estrutura de pastas
 
 ```
