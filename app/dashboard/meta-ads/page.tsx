@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Header from "@/components/Header";
+import Topbar from "@/components/Topbar";
 import FiltersBar, { defaultFilters } from "@/components/FiltersBar";
 import KpiCard from "@/components/KpiCard";
 import ChartCard from "@/components/ChartCard";
@@ -9,7 +9,12 @@ import DataTable from "@/components/DataTable";
 import TopEntities from "@/components/TopEntities";
 import Tabs from "@/components/Tabs";
 import { GradientAreaChart, BarStackChart } from "@/components/Charts";
-import { getCampaignTable, getKpis, getTimeSeries, getTopEntities } from "@/lib/data";
+import {
+  getCampaignTable,
+  getKpis,
+  getTimeSeries,
+  getTopEntities,
+} from "@/lib/data";
 import { formatCurrency, formatNumber, formatPercent } from "@/lib/format";
 import { chartPalette, placements } from "@/data/mock";
 import { currentUser } from "@/lib/auth";
@@ -41,17 +46,7 @@ export default function MetaAdsPage() {
 
   return (
     <div className="space-y-6">
-      <Header
-        role={currentUser.role}
-        clientName={currentUser.clientName}
-        period={filters.period}
-        lastUpdate="há 2 min"
-        status="Conectado"
-        summary={{
-          spend: formatCurrency(kpis.spend),
-          leads: formatNumber(kpis.leads),
-        }}
-      />
+      <Topbar clientName={currentUser.clientName} role={currentUser.role} />
       <Tabs />
       <FiltersBar onChange={setFilters} showClient={currentUser.role === "admin"} />
 

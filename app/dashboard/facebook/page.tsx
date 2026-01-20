@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Header from "@/components/Header";
+import Topbar from "@/components/Topbar";
 import FiltersBar, { defaultFilters } from "@/components/FiltersBar";
 import KpiCard from "@/components/KpiCard";
 import ChartCard from "@/components/ChartCard";
@@ -35,17 +35,7 @@ export default function FacebookPage() {
 
   return (
     <div className="space-y-6">
-      <Header
-        role={currentUser.role}
-        clientName={currentUser.clientName}
-        period={filters.period}
-        lastUpdate="há 2 min"
-        status="Conectado"
-        summary={{
-          spend: formatNumber(kpis.impressions),
-          leads: formatNumber(kpis.clicks),
-        }}
-      />
+      <Topbar clientName={currentUser.clientName} role={currentUser.role} />
       <Tabs />
       <FiltersBar onChange={setFilters} showClient={currentUser.role === "admin"} />
 
