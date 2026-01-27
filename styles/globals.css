@@ -9,9 +9,10 @@
 
 body {
   @apply bg-bg0 text-slate-100 min-h-screen;
-  background-image: radial-gradient(circle at top left, rgba(139, 92, 246, 0.18), transparent 45%),
-    radial-gradient(circle at 25% 20%, rgba(79, 209, 255, 0.12), transparent 50%),
-    radial-gradient(circle at 90% 10%, rgba(255, 79, 216, 0.12), transparent 55%);
+  background-image: radial-gradient(circle at top left, rgba(139, 92, 246, 0.28), transparent 45%),
+    radial-gradient(circle at 85% 12%, rgba(250, 204, 21, 0.18), transparent 48%),
+    radial-gradient(circle at 20% 18%, rgba(79, 209, 255, 0.12), transparent 52%),
+    linear-gradient(160deg, rgba(2, 4, 7, 0.98), rgba(7, 10, 15, 0.98));
 }
 
 * {
@@ -19,7 +20,8 @@ body {
 }
 
 .card-glass {
-  @apply bg-white/5 border border-white/10 backdrop-blur-lg;
+  @apply border border-white/10 backdrop-blur-lg;
+  background: rgba(6, 8, 12, 0.82);
 }
 
 .border-neon-gradient {
@@ -39,7 +41,7 @@ body {
 
 .glow-hover:hover {
   transform: translateY(-2px);
-  box-shadow: 0 0 30px rgba(79, 209, 255, 0.2);
+  box-shadow: 0 0 28px rgba(79, 209, 255, 0.18), 0 0 36px rgba(250, 204, 21, 0.12);
 }
 
 .noise {

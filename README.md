@@ -20,6 +20,12 @@ Abra `http://localhost:3000/dashboard/geral`.
 
 > Não existe `index.html` neste projeto. O conteúdo é renderizado pelo App Router do Next.
 
+## Como abrir o preview (qual opção escolher)
+
+- **Use o servidor do Next.js**, não um arquivo HTML estático.
+- A URL correta é **`http://localhost:3000/dashboard/geral`** após rodar `npm run dev`.
+- **Não abra `index.html` no navegador**, porque ele não existe neste projeto e não renderiza o dashboard.
+
 ## Estrutura de pastas
 
 ```
@@ -38,10 +44,10 @@ components/
   DataTable.tsx
   FiltersBar.tsx
   Funnel.tsx
+  Header.tsx
   KpiCard.tsx
   Sidebar.tsx
   Tabs.tsx
-  Topbar.tsx
   TopEntities.tsx
 lib/
   auth.ts

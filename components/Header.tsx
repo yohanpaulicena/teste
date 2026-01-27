@@ -71,7 +71,7 @@ export default function Header({
 
   return (
     <header className="sticky top-4 z-20">
-      <div className="card-glass rounded-3xl border border-white/10 bg-gradient-to-br from-bg1/80 to-bg0/80 p-6 shadow-card backdrop-blur-xl">
+      <div className="card-glass rounded-3xl border border-white/10 bg-gradient-to-br from-bg1/80 via-bg0/90 to-black p-6 shadow-card backdrop-blur-xl">
         <div className="flex flex-col gap-6">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex items-center gap-4">

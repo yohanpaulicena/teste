@@ -29,10 +29,31 @@ export default function Funnel({
               <stop offset="100%" stopColor="#0b1020" stopOpacity={0.9} />
             </linearGradient>
           ))}
+          <filter id="funnel-glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feDropShadow dx="0" dy="6" stdDeviation="8" floodColor="rgba(79,209,255,0.25)" />
+          </filter>
         </defs>
-        <polygon points="40,30 320,30 280,95 80,95" fill="url(#funnel-0)" stroke="rgba(79,209,255,0.5)" strokeWidth="1.5" />
-        <polygon points="70,105 290,105 250,170 110,170" fill="url(#funnel-1)" stroke="rgba(255,79,216,0.5)" strokeWidth="1.5" />
-        <polygon points="100,180 260,180 220,235 140,235" fill="url(#funnel-2)" stroke="rgba(139,92,246,0.5)" strokeWidth="1.5" />
+        <polygon
+          points="40,30 320,30 280,95 80,95"
+          fill="url(#funnel-0)"
+          stroke="rgba(79,209,255,0.6)"
+          strokeWidth="1.5"
+          filter="url(#funnel-glow)"
+        />
+        <polygon
+          points="70,105 290,105 250,170 110,170"
+          fill="url(#funnel-1)"
+          stroke="rgba(255,79,216,0.6)"
+          strokeWidth="1.5"
+          filter="url(#funnel-glow)"
+        />
+        <polygon
+          points="100,180 260,180 220,235 140,235"
+          fill="url(#funnel-2)"
+          stroke="rgba(250,204,21,0.6)"
+          strokeWidth="1.5"
+          filter="url(#funnel-glow)"
+        />
 
         {steps.map((step, index) => {
           const y = index === 0 ? 60 : index === 1 ? 135 : 205;

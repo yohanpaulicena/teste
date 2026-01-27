@@ -10,7 +10,7 @@ const randomSeed = (seed: number) => {
 };
 
 const seedFromFilters = (filters: Filters, scope: string) => {
-  const raw = `${filters.period}-${filters.channel}-${filters.campaign}-${filters.objective}-${filters.clientId}-${scope}`;
+  const raw = `${filters.period}-${filters.startDate}-${filters.endDate}-${filters.channel}-${filters.campaign}-${filters.objective}-${filters.clientId}-${scope}`;
   return raw.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
 };
 

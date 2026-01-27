@@ -21,8 +21,8 @@ import { formatCompact } from "@/lib/format";
 const axisStyle = { fontSize: 10, fill: "#94a3b8" };
 
 const tooltipStyle = {
-  background: "rgba(9, 11, 20, 0.9)",
-  border: "1px solid rgba(79, 209, 255, 0.3)",
+  background: "rgba(7, 8, 12, 0.92)",
+  border: "1px solid rgba(250, 204, 21, 0.35)",
   borderRadius: "12px",
   padding: "10px 12px",
   color: "#e2e8f0",

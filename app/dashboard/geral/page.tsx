@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Topbar from "@/components/Topbar";
+import Header from "@/components/Header";
 import FiltersBar, { defaultFilters } from "@/components/FiltersBar";
 import KpiCard from "@/components/KpiCard";
 import ChartCard from "@/components/ChartCard";
@@ -46,7 +46,17 @@ export default function GeralPage() {
 
   return (
     <div className="space-y-6">
-      <Topbar clientName={currentUser.clientName} role={currentUser.role} />
+      <Header
+        role={currentUser.role}
+        clientName={currentUser.clientName}
+        period={filters.period}
+        lastUpdate="há 2 min"
+        status="Conectado"
+        summary={{
+          spend: formatCurrency(kpis.spend),
+          leads: formatNumber(kpis.leads),
+        }}
+      />
       <Tabs />
       <FiltersBar onChange={setFilters} showClient={currentUser.role === "admin"} />
 
