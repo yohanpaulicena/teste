@@ -9,9 +9,9 @@
 
 body {
   @apply bg-bg0 text-slate-100 min-h-screen;
-  background-image: radial-gradient(circle at top left, rgba(139, 92, 246, 0.18), transparent 45%),
-    radial-gradient(circle at 25% 20%, rgba(79, 209, 255, 0.12), transparent 50%),
-    radial-gradient(circle at 90% 10%, rgba(255, 79, 216, 0.12), transparent 55%);
+  background-image: radial-gradient(circle at top left, rgba(139, 92, 246, 0.2), transparent 45%),
+    radial-gradient(circle at 80% 10%, rgba(250, 204, 21, 0.12), transparent 50%),
+    radial-gradient(circle at 25% 20%, rgba(79, 209, 255, 0.1), transparent 50%);
 }
 
 * {
@@ -19,7 +19,8 @@ body {
 }
 
 .card-glass {
-  @apply bg-white/5 border border-white/10 backdrop-blur-lg;
+  @apply border border-white/10 backdrop-blur-lg;
+  background: rgba(8, 10, 15, 0.72);
 }
 
 .border-neon-gradient {

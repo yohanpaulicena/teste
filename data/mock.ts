@@ -3,6 +3,7 @@ export const chartPalette = {
   pink: "#ff4fd8",
   purple: "#8b5cf6",
   blue: "#3b82f6",
+  yellow: "#facc15",
 };
 
 export const weekdays = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];

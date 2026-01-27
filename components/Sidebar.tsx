@@ -28,7 +28,7 @@ export default function Sidebar() {
   const pathname = usePathname();
   return (
     <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:shrink-0">
-      <div className="card-glass rounded-3xl p-6 shadow-card">
+      <div className="card-glass rounded-3xl p-6 shadow-card bg-bg1/70">
         <div className="flex items-center gap-3">
           <div className="h-11 w-11 rounded-2xl bg-gradient-to-br from-neonCyan to-neonPink flex items-center justify-center font-bold text-bg0">
             A

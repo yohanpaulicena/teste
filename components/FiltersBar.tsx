@@ -39,12 +39,12 @@ export default function FiltersBar({
   };
 
   return (
-    <div className="grid gap-3 rounded-3xl border border-white/10 bg-white/5 p-4 backdrop-blur lg:grid-cols-5">
+    <div className="card-glass grid gap-3 rounded-3xl p-4 lg:grid-cols-5">
       {showClient && (
         <div className="flex flex-col gap-2">
           <span className="text-[11px] uppercase tracking-[0.2em] text-slate-400">Cliente</span>
           <select
-            className="rounded-xl border border-white/10 bg-bg1/70 px-3 py-2 text-sm"
+            className="rounded-xl border border-white/10 bg-bg1/80 px-3 py-2 text-sm"
             value={filters.clientId}
             onChange={(event) => updateFilter("clientId", Number(event.target.value))}
           >
@@ -59,7 +59,7 @@ export default function FiltersBar({
       <div className="flex flex-col gap-2">
         <span className="text-[11px] uppercase tracking-[0.2em] text-slate-400">Período</span>
         <select
-          className="rounded-xl border border-white/10 bg-bg1/70 px-3 py-2 text-sm"
+          className="rounded-xl border border-white/10 bg-bg1/80 px-3 py-2 text-sm"
           value={filters.period}
           onChange={(event) => updateFilter("period", event.target.value)}
         >
@@ -73,7 +73,7 @@ export default function FiltersBar({
       <div className="flex flex-col gap-2">
         <span className="text-[11px] uppercase tracking-[0.2em] text-slate-400">Canal</span>
         <select
-          className="rounded-xl border border-white/10 bg-bg1/70 px-3 py-2 text-sm"
+          className="rounded-xl border border-white/10 bg-bg1/80 px-3 py-2 text-sm"
           value={filters.channel}
           onChange={(event) => updateFilter("channel", event.target.value)}
         >
@@ -87,7 +87,7 @@ export default function FiltersBar({
       <div className="flex flex-col gap-2">
         <span className="text-[11px] uppercase tracking-[0.2em] text-slate-400">Campanha</span>
         <select
-          className="rounded-xl border border-white/10 bg-bg1/70 px-3 py-2 text-sm"
+          className="rounded-xl border border-white/10 bg-bg1/80 px-3 py-2 text-sm"
           value={filters.campaign}
           onChange={(event) => updateFilter("campaign", event.target.value)}
         >
@@ -101,7 +101,7 @@ export default function FiltersBar({
       <div className="flex flex-col gap-2">
         <span className="text-[11px] uppercase tracking-[0.2em] text-slate-400">Objetivo</span>
         <select
-          className="rounded-xl border border-white/10 bg-bg1/70 px-3 py-2 text-sm"
+          className="rounded-xl border border-white/10 bg-bg1/80 px-3 py-2 text-sm"
           value={filters.objective}
           onChange={(event) => updateFilter("objective", event.target.value)}
         >

@@ -11,6 +11,7 @@ const config: Config = {
         neonPink: "#ff4fd8",
         neonPurple: "#8b5cf6",
         neonBlue: "#3b82f6",
+        neonYellow: "#facc15",
       },
       boxShadow: {
         glow: "0 0 25px rgba(79, 209, 255, 0.2)",

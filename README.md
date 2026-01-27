@@ -38,10 +38,10 @@ components/
   DataTable.tsx
   FiltersBar.tsx
   Funnel.tsx
+  Header.tsx
   KpiCard.tsx
   Sidebar.tsx
   Tabs.tsx
-  Topbar.tsx
   TopEntities.tsx
 lib/
   auth.ts
