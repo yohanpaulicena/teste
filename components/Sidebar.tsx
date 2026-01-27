@@ -16,9 +16,9 @@ import {
 const navItems = [
   { href: "/dashboard/geral", label: "Geral", icon: LayoutDashboard },
   { href: "/dashboard/trafego", label: "Tráfego", icon: BarChart3 },
-  { href: "/dashboard/social", label: "Social", icon: Share2 },
   { href: "/dashboard/meta-ads", label: "Meta Ads", icon: Megaphone },
   { href: "/dashboard/google-ads", label: "Google Ads", icon: Globe2 },
+  { href: "/dashboard/social", label: "Orgânico", icon: Share2 },
   { href: "/dashboard/instagram", label: "Instagram Orgânico", icon: Instagram },
   { href: "/dashboard/facebook", label: "Facebook Orgânico", icon: Facebook },
   { href: "/dashboard/configuracoes", label: "Configurações", icon: Settings, disabled: true },

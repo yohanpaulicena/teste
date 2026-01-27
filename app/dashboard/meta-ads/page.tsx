@@ -47,10 +47,10 @@ export default function MetaAdsPage() {
         period={filters.period}
         lastUpdate="há 2 min"
         status="Conectado"
-        summary={{
-          spend: formatCurrency(kpis.spend),
-          leads: formatNumber(kpis.leads),
-        }}
+        summary={[
+          { label: "Spend", value: formatCurrency(kpis.spend) },
+          { label: "Resultados", value: formatNumber(kpis.leads) },
+        ]}
       />
       <Tabs />
       <FiltersBar

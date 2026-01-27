@@ -37,10 +37,10 @@ export default function InstagramPage() {
         period={filters.period}
         lastUpdate="há 2 min"
         status="Conectado"
-        summary={{
-          spend: formatNumber(kpis.followers),
-          leads: formatNumber(kpis.clicks),
-        }}
+        summary={[
+          { label: "Seguidores", value: formatNumber(kpis.followers) },
+          { label: "Engajamento", value: formatPercent(kpis.engagement) },
+        ]}
       />
       <Tabs />
       <FiltersBar onChange={setFilters} showClient={currentUser.role === "admin"} />

@@ -65,7 +65,7 @@ export default function Header({
   period: string;
   lastUpdate: string;
   status: string;
-  summary: { spend: string; leads: string };
+  summary: Array<{ label: string; value: string }>;
 }) {
   const periodLabel = periodLabels[period] ?? period;
 
@@ -125,14 +125,12 @@ export default function Header({
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
-              <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Spend</p>
-              <p className="text-lg font-semibold text-white">{summary.spend}</p>
-            </div>
-            <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
-              <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Leads</p>
-              <p className="text-lg font-semibold text-white">{summary.leads}</p>
-            </div>
+            {summary.map((item) => (
+              <div key={item.label} className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3">
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-400">{item.label}</p>
+                <p className="text-lg font-semibold text-white">{item.value}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>

@@ -6,11 +6,11 @@ import { usePathname } from "next/navigation";
 const tabItems = [
   { href: "/dashboard/geral", label: "Geral" },
   { href: "/dashboard/trafego", label: "Tráfego" },
-  { href: "/dashboard/social", label: "Social" },
   { href: "/dashboard/meta-ads", label: "Meta Ads" },
   { href: "/dashboard/google-ads", label: "Google Ads" },
-  { href: "/dashboard/instagram", label: "Instagram" },
-  { href: "/dashboard/facebook", label: "Facebook" },
+  { href: "/dashboard/social", label: "Orgânico" },
+  { href: "/dashboard/instagram", label: "Instagram Orgânico" },
+  { href: "/dashboard/facebook", label: "Facebook Orgânico" },
 ];
 
 export default function Tabs() {

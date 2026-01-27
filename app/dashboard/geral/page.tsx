@@ -52,10 +52,10 @@ export default function GeralPage() {
         period={filters.period}
         lastUpdate="há 2 min"
         status="Conectado"
-        summary={{
-          spend: formatCurrency(kpis.spend),
-          leads: formatNumber(kpis.leads),
-        }}
+        summary={[
+          { label: "Spend", value: formatCurrency(kpis.spend) },
+          { label: "Leads", value: formatNumber(kpis.leads) },
+        ]}
       />
       <Tabs />
       <FiltersBar onChange={setFilters} showClient={currentUser.role === "admin"} />

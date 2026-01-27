@@ -29,6 +29,11 @@ export default function SocialPage() {
     engagement: series.engagement[index],
     engagementPrev: series.engagement[index] * 0.9,
   }));
+  const followerGrowth = series.labels.map((label, index) => ({
+    label,
+    followers: series.followers[index],
+    followersPrev: series.followers[index] * 0.9,
+  }));
   const activeDays = weekdays.map((label, index) => ({
     label,
     posts: Math.round(series.followers[index] ?? 40),
@@ -42,22 +47,22 @@ export default function SocialPage() {
         period={filters.period}
         lastUpdate="há 2 min"
         status="Conectado"
-        summary={{
-          spend: formatNumber(kpis.impressions),
-          leads: formatNumber(kpis.clicks),
-        }}
+        summary={[
+          { label: "Seguidores", value: formatNumber(kpis.followers) },
+          { label: "Engajamento", value: formatPercent(kpis.engagement) },
+        ]}
       />
       <Tabs />
       <FiltersBar onChange={setFilters} showClient={currentUser.role === "admin"} />
 
       <section className="grid gap-4 xl:grid-cols-4">
         <KpiCard label="Posts publicados" value={formatNumber(128)} delta="+10%" />
+        <KpiCard label="Seguidores ganhos" value={formatNumber(kpis.followers)} delta="+3%" />
         <KpiCard label="Alcance total" value={formatNumber(kpis.reach)} delta="+6%" />
         <KpiCard label="Impressões" value={formatNumber(kpis.impressions)} delta="+5%" />
         <KpiCard label="Interações" value={formatNumber(kpis.clicks)} delta="+8%" />
-        <KpiCard label="Engajamento" value={formatPercent(kpis.engagement)} delta="+4%" />
-        <KpiCard label="Seguidores" value={formatNumber(kpis.followers)} delta="+3%" />
-        <KpiCard label="Visitas ao perfil" value={formatNumber(kpis.clicks)} delta="+7%" />
+        <KpiCard label="Taxa de engajamento" value={formatPercent(kpis.engagement)} delta="+4%" />
+        <KpiCard label="Visitas ao perfil" value={formatNumber(kpis.clicks * 1.4)} delta="+7%" />
         <KpiCard label="Cliques no link" value={formatNumber(kpis.leads)} delta="+5%" />
       </section>
 
@@ -88,12 +93,28 @@ export default function SocialPage() {
             />
           </ChartCard>
         </div>
-        <ChartCard title="Dias mais ativos" description="Publicações por dia">
-          <BarStackChart data={activeDays} bars={[{ key: "posts", color: chartPalette.purple }]} />
+        <ChartCard title="Crescimento de seguidores" description="Evolução no período">
+          <GradientAreaChart
+            data={followerGrowth}
+            formatter={(value) => formatNumber(value)}
+            lines={[
+              { key: "followers", color: chartPalette.cyan, fill: chartPalette.cyan, name: "Seguidores" },
+              {
+                key: "followersPrev",
+                color: "rgba(79, 209, 255, 0.4)",
+                fill: chartPalette.cyan,
+                dashed: true,
+                name: "Seguidores (anterior)",
+              },
+            ]}
+          />
         </ChartCard>
       </section>
 
       <section className="grid gap-6 lg:grid-cols-3">
+        <ChartCard title="Dias mais ativos" description="Publicações por dia">
+          <BarStackChart data={activeDays} bars={[{ key: "posts", color: chartPalette.purple }]} />
+        </ChartCard>
         <ChartCard title="Audiência por gênero" description="Distribuição percentual">
           <DonutChart data={audienceSplit} colors={[chartPalette.pink, chartPalette.cyan, chartPalette.purple]} />
         </ChartCard>
@@ -107,6 +128,9 @@ export default function SocialPage() {
             colors={[chartPalette.blue, chartPalette.pink, chartPalette.cyan]}
           />
         </ChartCard>
+      </section>
+
+      <section className="grid gap-6">
         <ChartCard title="Top locais" description="Placeholder para mapa">
           <div className="flex h-[220px] items-center justify-center rounded-2xl border border-dashed border-white/10 text-sm text-slate-400">
             Área preparada para mapa/geo.
