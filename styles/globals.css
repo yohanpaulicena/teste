@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  font-feature-settings: "ss01", "ss02", "ss03";
+}
+
+body {
+  @apply bg-bg0 text-slate-100 min-h-screen;
+  background-image: radial-gradient(circle at top left, rgba(139, 92, 246, 0.28), transparent 45%),
+    radial-gradient(circle at 85% 12%, rgba(250, 204, 21, 0.18), transparent 48%),
+    radial-gradient(circle at 20% 18%, rgba(79, 209, 255, 0.12), transparent 52%),
+    linear-gradient(160deg, rgba(2, 4, 7, 0.98), rgba(7, 10, 15, 0.98));
+}
+
+* {
+  @apply scroll-smooth;
+}
+
+.card-glass {
+  @apply border border-white/10 backdrop-blur-lg;
+  background: rgba(6, 8, 12, 0.82);
+}
+
+.border-neon-gradient {
+  position: relative;
+  border-radius: 1.25rem;
+  padding: 1px;
+  background: linear-gradient(120deg, rgba(79, 209, 255, 0.65), rgba(255, 79, 216, 0.65));
+}
+
+.border-neon-gradient > div {
+  border-radius: 1.2rem;
+}
+
+.glow-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.glow-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 28px rgba(79, 209, 255, 0.18), 0 0 36px rgba(250, 204, 21, 0.12);
+}
+
+.noise {
+  position: fixed;
+  inset: 0;
+  opacity: 0.06;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
