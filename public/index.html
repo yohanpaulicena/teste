@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard Premium de Mídia & Performance</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  </head>
+  <body>
+    <div class="app">
+      <header class="hero">
+        <div class="hero-content">
+          <div class="brand">
+            <span class="logo">C</span>
+            <div>
+              <p class="eyebrow">Premium Analytics Suite</p>
+              <h1>Dashboard de Social & Tráfego Pago</h1>
+            </div>
+          </div>
+          <p class="subtitle">
+            Métricas conectadas a um modelo de dados MySQL (simulado) com
+            comparativos de período e visão por canal.
+          </p>
+        </div>
+        <div class="hero-actions">
+          <button class="ghost">Explorar dashboards</button>
+          <button class="primary">Configurar cliente</button>
+        </div>
+      </header>
+
+      <section class="filters">
+        <div class="filter-card">
+          <label>Período</label>
+          <select>
+            <option>Últimos 30 dias</option>
+            <option>Últimos 60 dias</option>
+            <option>Últimos 90 dias</option>
+          </select>
+        </div>
+        <div class="filter-card">
+          <label>Conta</label>
+          <select>
+            <option>Cliente Alpha</option>
+            <option>Cliente Beta</option>
+            <option>Cliente Gamma</option>
+          </select>
+        </div>
+        <div class="filter-card">
+          <label>Campanha</label>
+          <select>
+            <option>Todos</option>
+            <option>Conversão</option>
+            <option>Consideração</option>
+          </select>
+        </div>
+        <div class="filter-card">
+          <label>Segmento</label>
+          <select>
+            <option>Geral</option>
+            <option>E-commerce</option>
+            <option>SaaS</option>
+          </select>
+        </div>
+      </section>
+
+      <nav class="tabs" aria-label="Visões do dashboard">
+        <button class="tab active" data-tab="traffic">Visão Geral de Tráfego</button>
+        <button class="tab" data-tab="social">Visão Geral Social Media</button>
+        <button class="tab" data-tab="meta">Meta Ads</button>
+        <button class="tab" data-tab="instagram">Instagram</button>
+        <button class="tab" data-tab="google">Google Ads</button>
+      </nav>
+
+      <main class="tab-content">
+        <section class="tab-panel active" id="tab-traffic">
+          <div class="kpi-grid" data-kpi="traffic"></div>
+
+          <div class="chart-grid">
+            <section class="chart-card wide">
+              <header>
+                <h3>Investimento x Leads</h3>
+                <p>Comparativo diário com período anterior</p>
+              </header>
+              <canvas id="trafficSpendChart"></canvas>
+            </section>
+            <section class="chart-card">
+              <header>
+                <h3>Funil de Performance</h3>
+                <p>Impressões → Cliques → Leads</p>
+              </header>
+              <canvas id="trafficFunnelChart"></canvas>
+            </section>
+            <section class="chart-card">
+              <header>
+                <h3>CPA & CPC</h3>
+                <p>Eficiência por dia</p>
+              </header>
+              <canvas id="trafficEfficiencyChart"></canvas>
+            </section>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="tab-social">
+          <div class="kpi-grid" data-kpi="social"></div>
+
+          <div class="chart-grid">
+            <section class="chart-card wide">
+              <header>
+                <h3>Engajamento & Alcance</h3>
+                <p>Tendência por dia</p>
+              </header>
+              <canvas id="socialEngagementChart"></canvas>
+            </section>
+            <section class="chart-card">
+              <header>
+                <h3>Formato de Conteúdo</h3>
+                <p>Distribuição de visualizações</p>
+              </header>
+              <canvas id="socialFormatChart"></canvas>
+            </section>
+            <section class="chart-card">
+              <header>
+                <h3>Audiência por gênero</h3>
+                <p>Composição percentual</p>
+              </header>
+              <canvas id="socialAudienceChart"></canvas>
+            </section>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="tab-meta">
+          <div class="kpi-grid" data-kpi="meta"></div>
+
+          <div class="chart-grid">
+            <section class="chart-card wide">
+              <header>
+                <h3>Meta Ads: Custo x Conversões</h3>
+                <p>Performance diária</p>
+              </header>
+              <canvas id="metaPerformanceChart"></canvas>
+            </section>
+            <section class="chart-card">
+              <header>
+                <h3>Melhores campanhas</h3>
+                <p>Leads por campanha</p>
+              </header>
+              <canvas id="metaCampaignChart"></canvas>
+            </section>
+            <section class="chart-card">
+              <header>
+                <h3>Segmentos</h3>
+                <p>Distribuição de orçamento</p>
+              </header>
+              <canvas id="metaSegmentChart"></canvas>
+            </section>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="tab-instagram">
+          <div class="kpi-grid" data-kpi="instagram"></div>
+
+          <div class="chart-grid">
+            <section class="chart-card wide">
+              <header>
+                <h3>Instagram: Crescimento & Engajamento</h3>
+                <p>Seguidores e taxa por dia</p>
+              </header>
+              <canvas id="instagramGrowthChart"></canvas>
+            </section>
+            <section class="chart-card">
+              <header>
+                <h3>Stories vs Reels</h3>
+                <p>Retenção média</p>
+              </header>
+              <canvas id="instagramContentChart"></canvas>
+            </section>
+            <section class="chart-card">
+              <header>
+                <h3>Horários de pico</h3>
+                <p>Atividade por horário</p>
+              </header>
+              <canvas id="instagramPeakChart"></canvas>
+            </section>
+          </div>
+        </section>
+
+        <section class="tab-panel" id="tab-google">
+          <div class="kpi-grid" data-kpi="google"></div>
+
+          <div class="chart-grid">
+            <section class="chart-card wide">
+              <header>
+                <h3>Google Ads: Cliques & Conversões</h3>
+                <p>Comparativo diário</p>
+              </header>
+              <canvas id="googleClicksChart"></canvas>
+            </section>
+            <section class="chart-card">
+              <header>
+                <h3>Impressões & CPM</h3>
+                <p>Visibilidade por dia</p>
+              </header>
+              <canvas id="googleImpressionsChart"></canvas>
+            </section>
+            <section class="chart-card">
+              <header>
+                <h3>Distribuição de dispositivos</h3>
+                <p>Desktop, Mobile, Tablet</p>
+              </header>
+              <canvas id="googleDeviceChart"></canvas>
+            </section>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
