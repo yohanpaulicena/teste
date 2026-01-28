@@ -1,122 +1,147 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Header from "@/components/Header";
 import FiltersBar, { defaultFilters } from "@/components/FiltersBar";
 import KpiCard from "@/components/KpiCard";
 import ChartCard from "@/components/ChartCard";
 import DataTable from "@/components/DataTable";
 import Tabs from "@/components/Tabs";
-import { GradientAreaChart, BarStackChart, DonutChart } from "@/components/Charts";
-import { getKpis, getTimeSeries, getTopPosts } from "@/lib/data";
+import { GradientAreaChart, BarStackChart } from "@/components/Charts";
 import { formatNumber, formatPercent } from "@/lib/format";
-import { audienceSplit, chartPalette } from "@/data/mock";
+import { chartPalette } from "@/data/mock";
 import { currentUser } from "@/lib/auth";
+import { useAvailability } from "@/components/AvailabilityProvider";
+import { useDashboardData } from "@/lib/useDashboardData";
+import { useSourceGuard } from "@/lib/useSourceGuard";
 
 export default function InstagramPage() {
   const [filters, setFilters] = useState({
     ...defaultFilters,
     clientId: currentUser.clientId,
   });
-  const kpis = useMemo(() => getKpis(filters, "instagram"), [filters]);
-  const series = useMemo(() => getTimeSeries(filters, "instagram"), [filters]);
-  const posts = useMemo(() => getTopPosts(filters, "instagram"), [filters]);
+  const { clientName, refresh } = useAvailability();
+  const { kpis, series } = useDashboardData({
+    filters,
+    sources: ["instagram"],
+    metrics: [
+      "followers_count",
+      "account_day_total_interactions",
+      "account_day_reach",
+      "page_posts_impressions",
+      "account_day_profile_views",
+      "account_day_profile_links_taps",
+      "reels_posts_count",
+      "feed_posts_count",
+    ],
+  });
 
-  const growthData = series.labels.map((label, index) => ({
-    label,
-    followers: series.followers[index],
-    followersPrev: series.followers[index] * 0.92,
-    engagement: series.engagement[index],
-  }));
+  useSourceGuard("instagram");
+
+  useEffect(() => {
+    refresh(filters);
+  }, [filters, refresh]);
+
+  const growthData = useMemo(() => {
+    const followers = series.followers_count ?? [];
+    const interactions = series.account_day_total_interactions ?? [];
+    const map: Record<string, { label: string; followers?: number; interactions?: number }> = {};
+    followers.forEach((point) => {
+      map[point.date] = { label: point.date, followers: point.value };
+    });
+    interactions.forEach((point) => {
+      map[point.date] = { ...map[point.date], label: point.date, interactions: point.value };
+    });
+    return Object.values(map);
+  }, [series]);
 
   return (
     <div className="space-y-6">
       <Header
         role={currentUser.role}
-        clientName={currentUser.clientName}
+        clientName={clientName}
         period={filters.period}
         lastUpdate="há 2 min"
         status="Conectado"
         summary={[
-          { label: "Seguidores", value: formatNumber(kpis.followers) },
-          { label: "Engajamento", value: formatPercent(kpis.engagement) },
+          { label: "Seguidores", value: formatNumber(kpis.followers ?? 0) },
+          { label: "Interações", value: formatNumber(kpis.interactions ?? 0) },
         ]}
       />
       <Tabs />
       <FiltersBar onChange={setFilters} showClient={currentUser.role === "admin"} />
 
       <section className="grid gap-4 xl:grid-cols-4">
-        <KpiCard label="Seguidores" value={formatNumber(kpis.followers)} delta="+3%" />
-        <KpiCard label="Engajamento" value={formatPercent(kpis.engagement)} delta="+4%" />
-        <KpiCard label="Stories" value={formatNumber(58)} delta="+6%" />
-        <KpiCard label="Reels" value={formatNumber(42)} delta="+5%" />
-        <KpiCard label="Saves" value={formatNumber(1800)} delta="+7%" />
-        <KpiCard label="Comentários" value={formatNumber(860)} delta="+2%" />
-        <KpiCard label="Visitas" value={formatNumber(5200)} delta="+6%" />
-        <KpiCard label="Cliques" value={formatNumber(960)} delta="+4%" />
+        <KpiCard label="Seguidores" value={formatNumber(kpis.followers ?? 0)} delta="+3%" />
+        <KpiCard label="Interações" value={formatNumber(kpis.interactions ?? 0)} delta="+4%" />
+        <KpiCard label="Alcance" value={formatNumber(kpis.reach ?? 0)} delta="+6%" />
+        <KpiCard label="Impressões" value={formatNumber(kpis.impressions ?? 0)} delta="+5%" />
+        <KpiCard label="Visitas ao perfil" value={formatNumber(kpis.profile_views ?? 0)} delta="+6%" />
+        <KpiCard label="Cliques no link" value={formatNumber(kpis.link_clicks ?? 0)} delta="+4%" />
+        <KpiCard label="Reels" value={formatNumber(kpis.reels ?? 0)} delta="+5%" />
+        <KpiCard label="Feed" value={formatNumber(kpis.feed_posts ?? 0)} delta="+3%" />
       </section>
 
       <section className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <ChartCard title="Crescimento & Engajamento" description="Timeline diária">
+          <ChartCard title="Crescimento & Interações" description="Timeline diária">
             <GradientAreaChart
               data={growthData}
               formatter={(value) => formatNumber(value)}
               lines={[
                 { key: "followers", color: chartPalette.cyan, fill: chartPalette.cyan, name: "Seguidores" },
-                {
-                  key: "followersPrev",
-                  color: "rgba(79, 209, 255, 0.4)",
-                  fill: chartPalette.cyan,
-                  dashed: true,
-                  name: "Seguidores (anterior)",
-                },
-                { key: "engagement", color: chartPalette.pink, fill: chartPalette.pink, name: "Engajamento" },
+                { key: "interactions", color: chartPalette.pink, fill: chartPalette.pink, name: "Interações" },
               ]}
             />
           </ChartCard>
         </div>
-        <ChartCard title="Audiência por gênero" description="Distribuição">
-          <DonutChart data={audienceSplit} colors={[chartPalette.pink, chartPalette.cyan, chartPalette.purple]} />
+        <ChartCard title="Impressões" description="Volume diário">
+          <BarStackChart
+            data={(series.page_posts_impressions ?? []).map((point) => ({
+              label: point.date,
+              value: point.value,
+            }))}
+            bars={[{ key: "value", color: chartPalette.purple }]}
+          />
         </ChartCard>
       </section>
 
       <section className="grid gap-6 lg:grid-cols-2">
-        <ChartCard title="Formatos" description="Stories vs Reels">
+        <ChartCard title="Reels publicados" description="Volume diário">
           <BarStackChart
-            data={[
-              { label: "Stories", value: 72 },
-              { label: "Reels", value: 88 },
-              { label: "Feed", value: 64 },
-            ]}
-            bars={[{ key: "value", color: chartPalette.purple }]}
+            data={(series.reels_posts_count ?? []).map((point) => ({
+              label: point.date,
+              value: point.value,
+            }))}
+            bars={[{ key: "value", color: chartPalette.cyan }]}
           />
         </ChartCard>
-        <ChartCard title="Horários de pico" description="Atividade por horário">
+        <ChartCard title="Feed publicados" description="Volume diário">
           <BarStackChart
-            data={[
-              { label: "09h", value: 32 },
-              { label: "12h", value: 45 },
-              { label: "15h", value: 53 },
-              { label: "18h", value: 68 },
-              { label: "21h", value: 57 },
-            ]}
-            bars={[{ key: "value", color: chartPalette.cyan }]}
+            data={(series.feed_posts_count ?? []).map((point) => ({
+              label: point.date,
+              value: point.value,
+            }))}
+            bars={[{ key: "value", color: chartPalette.pink }]}
           />
         </ChartCard>
       </section>
 
       <DataTable
-        columns={["Post", "Data", "Alcance", "Engajamento", "Saves", "Shares", "Comentários", "Cliques"]}
-        rows={posts.map((row) => [
-          row.name,
-          row.date,
-          formatNumber(row.reach),
-          formatPercent(row.engagement),
-          formatNumber(row.saves),
-          formatNumber(row.shares),
-          formatNumber(row.comments),
-          formatNumber(row.clicks),
+        columns={["Data", "Seguidores", "Interações", "Alcance", "Impressões"]}
+        rows={(series.followers_count ?? []).map((point) => [
+          point.date,
+          formatNumber(point.value),
+          formatNumber(
+            (series.account_day_total_interactions ?? []).find((item) => item.date === point.date)
+              ?.value ?? 0
+          ),
+          formatNumber(
+            (series.account_day_reach ?? []).find((item) => item.date === point.date)?.value ?? 0
+          ),
+          formatNumber(
+            (series.page_posts_impressions ?? []).find((item) => item.date === point.date)?.value ?? 0
+          ),
         ])}
       />
     </div>

@@ -20,6 +20,10 @@ Abra `http://localhost:3000/dashboard/geral`.
 
 > Não existe `index.html` neste projeto. O conteúdo é renderizado pelo App Router do Next.
 
+## Configuração do banco (MySQL)
+
+Crie um arquivo `.env.local` baseado em `.env.local.example` com as credenciais do seu MySQL remoto.
+
 ## Como abrir o preview (qual opção escolher)
 
 - **Use o servidor do Next.js**, não um arquivo HTML estático.

@@ -111,7 +111,7 @@ export default function Header({
           </div>
 
           <div>
-            <h1 className="text-3xl font-semibold text-white">Dashboard de Social & Tráfego Pago</h1>
+            <h1 className="text-3xl font-semibold text-white">Resultados — {clientName}</h1>
             <p className="mt-2 text-sm text-slate-400">
               Dados consolidados por canal + comparativo com período anterior.
             </p>
