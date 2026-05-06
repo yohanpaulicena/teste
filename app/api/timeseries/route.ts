@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server";
+import type { RowDataPacket } from "mysql2";
 import pool from "@/lib/db";
+
+type TimeseriesRow = RowDataPacket & {
+  date: string;
+  value: number;
+};
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -15,7 +21,7 @@ export async function GET(request: Request) {
 
   const sources = source === "google_ads" ? ["google_ads", "google"] : [source];
   const placeholders = sources.map(() => "?").join(", ");
-  const [rows] = await pool.query<{ date: string; value: number }[]>(
+  const [rows] = await pool.query<TimeseriesRow[]>(
     `SELECT date, SUM(value) as value
      FROM metrics
      WHERE client_id = ?

@@ -1,5 +1,15 @@
 import { NextResponse } from "next/server";
+import type { RowDataPacket } from "mysql2";
 import pool from "@/lib/db";
+
+type SourceRow = RowDataPacket & {
+  source: string;
+  count: number;
+};
+
+type ClientRow = RowDataPacket & {
+  name: string;
+};
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -11,10 +21,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Missing parameters" }, { status: 400 });
   }
 
-  const [sources] = await pool.query<{
-    source: string;
-    count: number;
-  }[]>(
+  const [sources] = await pool.query<SourceRow[]>(
     `SELECT source, COUNT(*) as count
      FROM metrics
      WHERE client_id = ?
@@ -23,7 +30,7 @@ export async function GET(request: Request) {
     [clientId, from, to]
   );
 
-  const [clients] = await pool.query<{ name: string }[]>(
+  const [clients] = await pool.query<ClientRow[]>(
     "SELECT name FROM clients WHERE id = ? LIMIT 1",
     [clientId]
   );

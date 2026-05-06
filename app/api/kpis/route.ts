@@ -1,6 +1,13 @@
 import { NextResponse } from "next/server";
+import type { RowDataPacket } from "mysql2";
 import pool from "@/lib/db";
 import { metricMap, type SourceKey } from "@/lib/metricMap";
+
+type MetricRow = RowDataPacket & {
+  metric: string;
+  value: number;
+  date: string;
+};
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -16,7 +23,7 @@ export async function GET(request: Request) {
   const sources = source === "google_ads" ? ["google_ads", "google"] : [source];
   const placeholders = sources.map(() => "?").join(", ");
 
-  const [rows] = await pool.query<{ metric: string; value: number; date: string }[]>(
+  const [rows] = await pool.query<MetricRow[]>(
     `SELECT metric, value, date
      FROM metrics
      WHERE client_id = ?
